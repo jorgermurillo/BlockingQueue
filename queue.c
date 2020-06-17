@@ -1,5 +1,7 @@
 #include "queue.h"
 
+// Creates a poinetr to a new queue. Returns NULL if there was an error.
+
 Queue* newQueue(){
 
     Queue* queue = (Queue*) malloc(sizeof(Queue));
@@ -72,7 +74,44 @@ int enqueue(Queue* queue, void* obj){
     return 0;
 };
 
-int size(Queue* queue);
+void destroyQueue(Queue* queue){
+
+    freeList(queue->head, queue->tail);
+
+    sem_destroy(&(queue->semaphore));
+    pthread_mutex_destroy(&(queue->mutex));
+
+};
+
+// Function used to free the linked list inside the Queue. IT DOESN'T FREE THE DATA INSIDE.
+void freeList(Node * head, Node* tail){
+    if(head==NULL){
+        return;
+    }
+
+    Node* tmp_node=head;
+    Node* next_node = tmp_node->next;
+    
+    while(tmp_node!=tail){
+        free(tmp_node);
+        tmp_node = next_node;
+        next_node = next_node->next;
+    }
+    // Once we leave the WHILE() loop, the last node (the tail) still needs to be freed
+    free(tmp_node);
+}
+
+// Returns true when the Queue is empty, false otherwise. Uses the internal lock!
+bool isEmpty(Queue* queue){
+    pthread_mutex_lock(&(queue->mutex));
+    bool res = false;
+    if(queue->head==NULL){
+        res = true;
+    }
+    
+    pthread_mutex_unlock(&(queue->mutex));
+    return res;
+};
 
 
 /*

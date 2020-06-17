@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <stdbool.h>
 
 // Structure that represent the nodes in the linked list.
 typedef struct node{
@@ -20,7 +21,7 @@ typedef struct queue{
     // semaphore used to control the access to the queue. This semaphore is what makes the queue block when using the dequeue() function.
     sem_t semaphore;
     // Mutex lock thats used when queueing/dequeueing. Difference with the semaphore:
-    // On Dequeueing, the semaphore blocks the function call if there are no items to dequeue. Once there is at least one item
+    // On dequeueing, the semaphore blocks the function call if there are no items to dequeue. Once there is at least one item
     // available, the mutex is used to avoid race conditions when actually dequeueing the object.
     pthread_mutex_t mutex;
 } Queue;
@@ -33,4 +34,6 @@ int dequeue(Queue* queue, void** object_repo);
 
 int enqueue(Queue* queue, void* obj);
 
-int size(Queue* queue);
+void destroyQueue(Queue* queue);
+
+bool isEmpty(Queue* queue);
